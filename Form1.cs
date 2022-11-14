@@ -130,8 +130,9 @@ namespace AllgebraTaskWinForm
         }
 
 
-        //some test cases to try
-        public float[,] matrix = new float[3, 4]
+        //****some test cases to try***
+
+        /*public float[,] matrix = new float[3, 4]
         {
                 {  1   , 2  , -1 , -4 },
                 {  2   , 3  , -1 , -11},
@@ -141,7 +142,8 @@ namespace AllgebraTaskWinForm
         float[,] matrix2 = new float[2, 6]{
                 {  1, 1, 1, 1,1 ,2},
                 {  1, 1, 1, 0,0,4 }
-        };
+        };*/
+
 
         float[,] inputmatrix;
         private void stringInput()
@@ -175,7 +177,6 @@ namespace AllgebraTaskWinForm
                         {
                             continue;
                         }
-
                         if ((int.TryParse(theCurrentChar, out int x)))
                         {
                             theCurrentCellInTheTempArray += x.ToString();
@@ -192,6 +193,7 @@ namespace AllgebraTaskWinForm
                 }
             }
 
+
             this.inputmatrix = new float[r, c];
             foreach (var item in theTempArray)
             {
@@ -204,6 +206,8 @@ namespace AllgebraTaskWinForm
                     }
                 }
             }
+
+            //just looping the input array to display the augmented matrix
 
             for (int k = 0; k < inputmatrix.GetLength(0); k++)
             {
@@ -222,6 +226,12 @@ namespace AllgebraTaskWinForm
             }
             this.richTextBox6.Text += "\n";
 
+
+            //calling the method to solve the matrix 
+            ToReducedRowEchelonForm(this.inputmatrix);
+
+            //****this section is still in progress*****
+
             if (!btn)
             {
                 for (int i = 0; i < r; i++)
@@ -229,7 +239,7 @@ namespace AllgebraTaskWinForm
                     var temp = "";
                     for (int j = 0; j < c; j++)
                     {
-                        var f = $"{vars[i]} = " + inputmatrix[i, c - 1] + "\n";
+                        var f = $"{vars[i]} = " + this.inputmatrix[i, c - 1] + "\n";
                         if (temp == f) break;
                         this.richTextBox3.Text += f;
                         temp = f;
@@ -247,34 +257,20 @@ namespace AllgebraTaskWinForm
 
             btn = false;
 
-
-
+            //calling the method that does all the operations to the input text to extract the values out of it
             stringInput();
-
-            //just looping the input array to display the augmented matrix
-
-            
-
-            //calling the method to solve the matrix
-            this.matrix = ToReducedRowEchelonForm(this.inputmatrix);
-
-     
-            //****this section is still in progress*****
-
-            
 
         }
         private void button2_Click(object sender, EventArgs e)
         {
+            //for clearing out the textbox to use it again
             this.richTextBox6.Text = string.Empty;
             this.richTextBox1.Text = string.Empty;
             this.richTextBox3.Text = string.Empty;
 
             btn = true;
+            //calling the method that does all the operations to the input text to extract the values out of it
             stringInput();
-
-            this.matrix = ToReducedRowEchelonForm(this.inputmatrix);
-
 
         }
 
