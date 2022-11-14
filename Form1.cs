@@ -4,7 +4,7 @@ namespace AllgebraTaskWinForm
 {
     public partial class Form1 : Form
     {
-
+        bool btn;
         float[,] ToReducedRowEchelonForm(float[,] matrix)
         {
             //some important vars for the matrix that will be used most of the time
@@ -24,6 +24,7 @@ namespace AllgebraTaskWinForm
 
                         if (Math.Abs(matrix[k, j]) <= eps) matrix[k, j] = 0;
                         this.richTextBox1.Text += matrix[k, j];
+
                         if (j == columnCount - 1) { this.richTextBox1.Text += "]"; }
                         if (j < columnCount - 1) { this.richTextBox1.Text += ", "; }
                     }
@@ -59,7 +60,6 @@ namespace AllgebraTaskWinForm
                             loop(matrix);
                             return matrix;
                         }
-
                     }
                 }
 
@@ -88,20 +88,41 @@ namespace AllgebraTaskWinForm
 
                 for (int j = 0; j < rowCount; j++)
                 {
-                    if (j != r)
+
+                    if (btn)
+                    {
+
+                    if (j > r)
                     {
                         float sub = matrix[j, lead];
+                        //A comment to clear out what happend in this step
+                     
+                        this.richTextBox1.Text += $"Subtract {matrix[j,r]} times (Row {r+1}) to (Row {j+1}) such as the element in row {j+1}, column {r+1} becomes 0:\n\n" ;
                         for (int k = 0; k < columnCount; k++)
                         {
                             matrix[j, k] -= (sub * matrix[r, k]);
-                        }
-
-                        //A comment to clear out what happend in this step
-                        this.richTextBox1.Text += $"Eliminate the column number {r + 1} of the row number {j + 1} \n";
-                        
+                        }   
                         //loop the matrix to print the new changes made to it
                         loop(matrix);
                     }
+                    }
+                    else
+                    {
+                        if (j != r)
+                        {
+                            float sub = matrix[j, lead];
+                            //A comment to clear out what happend in this step
+
+                            this.richTextBox1.Text += $"Subtract {matrix[j, r]} times (Row {r + 1}) to (Row {j + 1}) such as the element in row {j + 1}, column {r + 1} becomes 0:\n\n";
+                            for (int k = 0; k < columnCount; k++)
+                            {
+                                matrix[j, k] -= (sub * matrix[r, k]);
+                            }
+                            //loop the matrix to print the new changes made to it
+                            loop(matrix);
+                        }
+                    }
+
                 }
                 lead++;
             }
@@ -122,31 +143,30 @@ namespace AllgebraTaskWinForm
                 {  1, 1, 1, 0,0,4 }
         };
 
-
-        private void button1_Click(object sender, EventArgs e)
+        float[,] inputmatrix;
+        private void stringInput()
         {
-            //for clearing out the textbox to use it again
-            this.richTextBox6.Text = string.Empty;
-
             //getting the number of the rows and columns from the user (r = rows , c = columns)
             int r = int.Parse(this.richTextBox4.Text);
             int c = int.Parse(this.richTextBox5.Text);
 
             //some important vars for the matrix that will be used most of the time
+
             string theEquationsInOneString = this.richTextBox2.Text;           
             string[] rowOfStrings = theEquationsInOneString.Split("/v");
             string[] theTempArray = new string[r * c];
+            char[] vars = new char[r * c];
             string theCurrentCellInTheTempArray = string.Empty;
-          
 
             for (int i = 0; i < theTempArray.Length; i++)
             {
-                for(int l = 0; l < rowOfStrings.Length; l++)
+                for (int l = 0; l < rowOfStrings.Length; l++)
                 {
                     for (int j = 0; j < rowOfStrings[l].Length; j++)
                     {
                         string theCurrentChar = Convert.ToString(rowOfStrings[l][j]);
-                        if (theCurrentChar == "+"|| theCurrentChar == "-")
+
+                        if (theCurrentChar == "+" || theCurrentChar == "-")
                         {
                             theCurrentCellInTheTempArray += theCurrentChar;
                             continue;
@@ -163,6 +183,7 @@ namespace AllgebraTaskWinForm
                         }
                         else
                         {
+                            vars[i] = Convert.ToChar(theCurrentChar);
                             rowOfStrings[l] = rowOfStrings[l].Substring(j + 1);
                             theCurrentCellInTheTempArray = string.Empty;
                             break;
@@ -171,20 +192,18 @@ namespace AllgebraTaskWinForm
                 }
             }
 
-            float[,] inputmatrix = new float[r, c];
+            this.inputmatrix = new float[r, c];
             foreach (var item in theTempArray)
             {
                 for (int i = 0, u = 0; i < inputmatrix.GetLength(0); i++)
                 {
                     for (int j = 0; j < inputmatrix.GetLength(1); j++)
                     {
-                        inputmatrix[i, j] =int.Parse(theTempArray[u]);
+                        inputmatrix[i, j] = int.Parse(theTempArray[u]);
                         u++;
                     }
                 }
             }
-
-            //just looping the input array to display the augmented matrix
 
             for (int k = 0; k < inputmatrix.GetLength(0); k++)
             {
@@ -195,30 +214,67 @@ namespace AllgebraTaskWinForm
 
                     if (Math.Abs(inputmatrix[k, j]) <= eps) inputmatrix[k, j] = 0;
                     this.richTextBox6.Text += inputmatrix[k, j];
-                    if (j == 3) { this.richTextBox6.Text += "]"; }
-                    if (j < 3) { this.richTextBox6.Text += ", "; }
+
+                    if (j == c - 1) { this.richTextBox6.Text += "]"; }
+                    if (j < c - 1) { this.richTextBox6.Text += ", "; }
                 }
                 this.richTextBox6.Text += "\n";
             }
             this.richTextBox6.Text += "\n";
 
+            if (!btn)
+            {
+                for (int i = 0; i < r; i++)
+                {
+                    var temp = "";
+                    for (int j = 0; j < c; j++)
+                    {
+                        var f = $"{vars[i]} = " + inputmatrix[i, c - 1] + "\n";
+                        if (temp == f) break;
+                        this.richTextBox3.Text += f;
+                        temp = f;
+                    }
+                }
+            }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            //for clearing out the textbox to use it again
+            this.richTextBox6.Text = string.Empty;
+            this.richTextBox1.Text = string.Empty;
+            this.richTextBox3.Text = string.Empty;
+
+            btn = false;
+
+
+
+            stringInput();
+
+            //just looping the input array to display the augmented matrix
+
+            
 
             //calling the method to solve the matrix
-            this.matrix = ToReducedRowEchelonForm(inputmatrix);
+            this.matrix = ToReducedRowEchelonForm(this.inputmatrix);
 
-
-
+     
             //****this section is still in progress*****
 
-            /*for (int i = 0; i < r; i++)
-            {
-                for (int j = 0; j < c; j++)
-                {
-                    this.richTextBox3.Text += "X = " + inputmatrix[0, c - 1] + "\n";
-                    this.richTextBox3.Text += "Y = " + inputmatrix[1, c - 1] + "\n";
-                    this.richTextBox3.Text += "Z = " + inputmatrix[2, c - 1] + "\n";
-                }
-            }*/
+            
+
+        }
+        private void button2_Click(object sender, EventArgs e)
+        {
+            this.richTextBox6.Text = string.Empty;
+            this.richTextBox1.Text = string.Empty;
+            this.richTextBox3.Text = string.Empty;
+
+            btn = true;
+            stringInput();
+
+            this.matrix = ToReducedRowEchelonForm(this.inputmatrix);
+
 
         }
 
@@ -243,11 +299,15 @@ namespace AllgebraTaskWinForm
         {
 
         }
-
         private void richTextBox3_TextChanged(object sender, EventArgs e)
         {
 
         }
+
     }
 
 }
+/*
+1x + 1y + 1z = 4
+ 2x + 1y + 0z = 2
+3x - 1y + 1z = 6*/
